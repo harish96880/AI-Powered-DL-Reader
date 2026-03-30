@@ -1,0 +1,15 @@
+.home {
+    width: 100%;
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #2C64CA;
+    background: radial-gradient(at right bottom, #2C64CA, #EC4C6D);
+}
+
+.error {
+  margin-top: 16px;
+  color: #ff6b6b;
+  font-weight: 600;
+}

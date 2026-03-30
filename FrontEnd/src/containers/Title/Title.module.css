@@ -1,0 +1,11 @@
+.title{
+    font-family: monospace;
+    color: white;
+    font-weight: 300;
+    padding: 4vh;
+}
+
+.titleDiv{
+    width: 100%;
+    text-align: center;
+}
