@@ -6,38 +6,40 @@ import traceback
 
 from pdf2image import convert_from_bytes
 
+# inga we create one api application and named it PaddleOCR Service
 app = FastAPI(title="PaddleOCR Service")
 
+# inga we are storing OCR model, because each api call apa OCR load panom na namaku delay agum
 ocr = PaddleOCR(
-    use_angle_cls=True, 
-    lang="en"             
+    use_angle_cls=True, # image rotated irunchuna, auto correct panikum
+    lang="en"  # it only recognizes characters in english           
 )
 
 def preprocess(img_bgr):
-    gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY)
-    gray = cv2.GaussianBlur(gray, (3, 3), 0)
-    th = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1]
-    return cv2.cvtColor(th, cv2.COLOR_GRAY2BGR)
+    gray = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2GRAY) # gray color mathidrom, namaku text read pana color theva ila so complexity reduce panidrom
+    gray = cv2.GaussianBlur(gray, (3, 3), 0) # image la noise reduce pandrom, letters lam smooth aga
+    th = cv2.threshold(gray, 0, 255, cv2.THRESH_BINARY + cv2.THRESH_OTSU)[1] # texts pure black pandrom, background pure white pandrom
+    return cv2.cvtColor(th, cv2.COLOR_GRAY2BGR) # 1 channel image ja 3 channel ja convert pandrom
 
 
 
 def ocr_image(img_bgr):
-    result = ocr.ocr(img_bgr)
-    if isinstance(result, list) and len(result) > 0 and isinstance(result[0], dict):
-        rec_texts = result[0].get("rec_texts", [])
-        rec_scores = result[0].get("rec_scores", [])
+    img_bgr = preprocess(img_bgr) # pre processing call pandrom 💀 work agalana remove panidu
+    result = ocr.ocr(img_bgr) # OCR call pani text extract pandrom
+    if isinstance(result, list) and len(result) > 0 and isinstance(result[0], dict): # if result list or dict irundha condition check
+        rec_texts = result[0].get("rec_texts", []) # extract pana texts
+        rec_scores = result[0].get("rec_scores", []) # extract pana each wordings oda confidence number
 
         lines = []
-        for i, text in enumerate(rec_texts):
+        for i, text in enumerate(rec_texts): # new ocr format la irundha append pandradhuku
             text = str(text).strip()
-            score = float(rec_scores[i]) if i < len(rec_scores) else 1.0
             if text:
                 lines.append(text)
 
         return "\n".join(lines).strip()
 
     lines = []
-    for page in result:
+    for page in result: # old ocr format la irundha append pandradhuku
         for item in page:
             try:
                 text = item[1][0]

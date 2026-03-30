@@ -22,7 +22,7 @@ public class PaddleOcrClient {
         try {
             MultipartBodyBuilder builder = new MultipartBodyBuilder();
 
-            // ✅ send file to FastAPI service
+            // send file to FastAPI service
             builder.part("file", new ByteArrayResource(file.getBytes()) {
                         @Override
                         public String getFilename() {
@@ -42,7 +42,7 @@ public class PaddleOcrClient {
             if (response == null || response.getText() == null) {
                 throw new RuntimeException("OCR service returned empty response");
             }
-
+            System.out.println(response.getText());
             return response.getText();
 
         } catch (Exception e) {
